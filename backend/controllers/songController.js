@@ -1,15 +1,20 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import r2Client from "../utils/r2Client.js";
 import crypto from "crypto";
+import prisma from "../utils/prisma.js";
 
 export const postSong = async (req, res) => {
   try {
- 
     if (!req.file) {
       return res.status(400).json({ error: "No file uploaded" });
     }
 
-    const { title, artist } = req.body;
+    const { title, artistName } = req.body;
+    if (!title || !artistName) {
+      return res
+        .status(400)
+        .json({ error: "Title and artist name are required" });
+    }
     const fileExt = req.file.originalname.split(".").pop();
     const key = `mp3/${crypto.randomUUID()}.${fileExt}`;
 
@@ -19,18 +24,27 @@ export const postSong = async (req, res) => {
         Key: key,
         Body: req.file.buffer,
         ContentType: req.file.mimetype,
-      })
+      }),
     );
 
-    const fileUrl = `${process.env.R2_PUBLIC_URL}/${key}`;
+    const audioUrl = `${process.env.R2_PUBLIC_URL}/${key}`;
 
-    // TODO: save { title, artist, fileUrl, key } to your database here
-
+    const song = await prisma.song.create({
+      data: {
+        title,
+        audioUrl,
+        fileKey: key,
+        artist: {
+          connectOrCreate: {
+            where: { name: artistName },
+            create: { name: artistName },
+          },
+        },
+      },
+    });
     res.status(201).json({
       message: "Song uploaded successfully",
-      url: fileUrl,
-      title,
-      artist,
+      song,
     });
   } catch (err) {
     console.error(err);
