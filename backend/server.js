@@ -3,11 +3,14 @@ import path from "path";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import songsRoute from "./routes/songsRoute.js";
-
+import cors from "cors";
 dotenv.config();
 
 const app = express();
 const __dirname = path.resolve();
+app.use(cors({
+  origin: "http://localhost:5173", // your Vite dev server URL
+}));
 
 app.use(express.json());
 app.use(cookieParser());
