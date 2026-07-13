@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import songsRoute from "./routes/songsRoute.js";
 import cors from "cors";
+import authRoute from "./routes/authRoute.js";
 dotenv.config();
 
 const app = express();
@@ -17,6 +18,8 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/songs", songsRoute);
+app.use("/api/auth", authRoute);
+
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
