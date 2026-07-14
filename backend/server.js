@@ -1,7 +1,6 @@
 import express from "express";
 import path from "path";
 import dotenv from "dotenv";
-import cookieParser from "cookie-parser";
 import songsRoute from "./routes/songsRoute.js";
 import cors from "cors";
 import authRoute from "./routes/authRoute.js";
@@ -14,7 +13,6 @@ app.use(cors({
 }));
 
 app.use(express.json());
-app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/songs", songsRoute);

@@ -2,6 +2,7 @@ import { PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import r2Client from "../utils/r2Client.js";
 import crypto from "crypto";
 import prisma from "../utils/prisma.js";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 export const postSong = async (req, res) => {
   try {
@@ -27,17 +28,19 @@ export const postSong = async (req, res) => {
       }),
     );
 
-    const audioUrl = `${process.env.R2_PUBLIC_URL}/${key}`;
-
     const song = await prisma.song.create({
       data: {
         title,
-        audioUrl,
         fileKey: key,
         artist: {
           connectOrCreate: {
             where: { name: artistName },
             create: { name: artistName },
+          },
+        },
+        uploader: {
+          connect: {
+            id: req.user.id,
           },
         },
       },
@@ -55,7 +58,11 @@ export const postSong = async (req, res) => {
 export const getSongs = async (req, res) => {
   try {
     const songs = await prisma.song.findMany({
-      include: {
+      select: {
+        id: true,
+        title: true,
+        duration: true,
+        createdAt: true,
         artist: true,
       },
     });
@@ -73,8 +80,12 @@ export const getSong = async (req, res) => {
       return res.status(400).json({ error: "Invalid song id" });
     }
     const song = await prisma.song.findUnique({
-      where: { id: parseInt(id) },
-      include: {
+      where: { id },
+      select: {
+        id: true,
+        title: true,
+        duration: true,
+        createdAt: true,
         artist: true,
       },
     });
@@ -147,5 +158,34 @@ export const deleteSong = async (req, res) => {
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: "Failed to delete song" });
+  }
+};
+export const getStreamUrl = async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ error: "Invalid song id" });
+    }
+
+    const song = await prisma.song.findUnique({
+      where: { id },
+      select: { fileKey: true },
+    });
+
+    if (!song) {
+      return res.status(404).json({ error: "Song not found" });
+    }
+
+    const command = new GetObjectCommand({
+      Bucket: process.env.R2_BUCKET_NAME,
+      Key: song.fileKey,
+    });
+
+    const audioUrl = await getSignedUrl(r2Client, command, { expiresIn: 3600 });
+
+    res.status(200).json({ audioUrl, expiresIn: 3600 });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Failed to generate stream URL" });
   }
 };

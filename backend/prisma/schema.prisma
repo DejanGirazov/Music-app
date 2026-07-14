@@ -19,7 +19,6 @@ model Song {
   title      String
   artist     Artist   @relation(fields: [artistId], references: [id])
   artistId   Int
-  audioUrl   String
   uploaderId  Int
   uploader    User     @relation(fields: [uploaderId], references: [id])
   fileKey    String   // R2 object key, for deletes/updates
