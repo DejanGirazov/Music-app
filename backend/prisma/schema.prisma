@@ -20,10 +20,28 @@ model Song {
   artist     Artist   @relation(fields: [artistId], references: [id])
   artistId   Int
   audioUrl   String
+  uploaderId  Int
+  uploader    User     @relation(fields: [uploaderId], references: [id])
   fileKey    String   // R2 object key, for deletes/updates
   duration   Int?     // seconds
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
   @@index([artistId])
+}
+enum Role {
+  USER
+  ADMIN
+}
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  fullName     String   
+  passwordHash String
+  role         Role     @default(USER)
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  songs        Song[]
 }

@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import prisma from "../utils/prisma.js";
 
 export const protectRoute = async (req, res, next) => {
   try {
@@ -14,7 +15,7 @@ export const protectRoute = async (req, res, next) => {
       select: {
         id: true,
         email: true,
-        username: true,
+        fullName: true,
         role: true,
       },
     });
