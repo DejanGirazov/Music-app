@@ -170,3 +170,43 @@ export const updateMe = async (req, res) => {
     });
   }
 };
+export const updateUserRole = async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const { role } = req.body;
+
+    if (!["USER", "ADMIN"].includes(role)) {
+      return res.status(400).json({ error: "Invalid role" });
+    }
+    if (id === req.user.id) {
+      return res.status(400).json({ error: "You cannot change your own role" });
+    }
+
+    const user = await prisma.user.update({
+      where: { id },
+      data: { role },
+      select: { id: true, email: true, fullName: true, role: true },
+    });
+
+    res.status(200).json(user);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Failed to update role" });
+  }
+};
+export const getAllUsers = async (req,res)=>{
+  try {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        role: true,
+      },
+    });
+    res.status(200).json(users);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Failed to fetch users" });
+  }
+}
