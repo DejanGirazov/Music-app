@@ -1,8 +1,10 @@
-import { PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import r2Client from "../utils/r2Client.js";
 import crypto from "crypto";
 import prisma from "../utils/prisma.js";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { parseBuffer } from "music-metadata";
+
 
 export const postSong = async (req, res) => {
   try {
@@ -27,6 +29,10 @@ export const postSong = async (req, res) => {
         ContentType: req.file.mimetype,
       }),
     );
+    const metadata = await parseBuffer(req.file.buffer, req.file.mimetype);
+const duration = metadata.format.duration
+  ? Math.round(metadata.format.duration)
+  : null;
 
     const song = await prisma.song.create({
       data: {
@@ -38,6 +44,7 @@ export const postSong = async (req, res) => {
             create: { name: artistName },
           },
         },
+        duration,
         uploader: {
           connect: {
             id: req.user.id,

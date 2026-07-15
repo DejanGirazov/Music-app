@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import songsRoute from "./routes/songsRoute.js";
 import cors from "cors";
 import authRoute from "./routes/authRoute.js";
+import playlistRoute from "./routes/playlistRoute.js";
 dotenv.config();
 
 const app = express();
@@ -17,6 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/songs", songsRoute);
 app.use("/api/auth", authRoute);
+app.use("/api/playlist", playlistRoute);
 
 
 if (process.env.NODE_ENV === "production") {
