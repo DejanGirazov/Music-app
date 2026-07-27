@@ -1,0 +1,49 @@
+{
+  "expo": {
+    "name": "Tempo",
+    "slug": "Tempo",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/tempo-icon.png",
+    "scheme": "frontendmobile",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "icon": "./assets/images/tempo-logo.png",
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0F172A",
+        "foregroundImage": "./assets/images/tempo-logo.png",
+        "monochromeImage": "./assets/images/tempo-logo.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "com.dejan4577.frontendmobile"
+    },
+    "web": {
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#208AEF",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 76
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "1676e849-7be1-497b-b89f-5e30e252d532"
+      }
+    }
+  }
+}
