@@ -94,27 +94,27 @@ export default function Home() {
       </Text>
 
       <FlatList
-        data={songs}
-        keyExtractor={(item) => item.id.toString()}
-        onRefresh={refetch}
-        refreshing={isRefetching}
-        contentContainerStyle={{ paddingBottom: 24 }}
-        ItemSeparatorComponent={() => <View className="h-2" />}
-        ListEmptyComponent={
-          <Text className="text-gray-400 text-center mt-10">
-            No songs uploaded yet.
-          </Text>
-        }
-        renderItem={({ item }) => (
-          <SongCard
-            song={item}
-            isCurrent={playingId === item.id}
-            isPlaying={playingId === item.id && status.playing}
-            isLoading={loadingId === item.id}
-            onPress={handlePress}
-          />
-        )}
-      />
+  data={songs}
+  keyExtractor={(item) => item.id.toString()}
+  onRefresh={refetch}
+  refreshing={isRefetching}
+  contentContainerStyle={{ paddingBottom: 24 }}
+  ListEmptyComponent={
+    <Text className="text-gray-400 text-center mt-10">
+      No songs uploaded yet.
+    </Text>
+  }
+  renderItem={({ item }) => (
+    <SongCard
+      song={item}
+      isCurrent={playingId === item.id}
+      isPlaying={playingId === item.id && status.playing}
+      isLoading={loadingId === item.id}
+      currentTime={playingId === item.id ? status.currentTime : null}
+      onPress={handlePress}
+    />
+  )}
+/>
     </View>
   );
 }

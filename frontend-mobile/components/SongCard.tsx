@@ -20,11 +20,12 @@ type SongCardProps = {
   isCurrent: boolean;
   isPlaying: boolean;
   isLoading: boolean;
+  currentTime?: number | null;
   onPress: (song: Song) => void;
 };
 
-function formatDuration(seconds: number | null) {
-  if (!seconds && seconds !== 0) return "--:--";
+function formatTime(seconds: number | null | undefined) {
+  if (seconds === null || seconds === undefined || isNaN(seconds)) return "--:--";
   const m = Math.floor(seconds / 60);
   const s = Math.floor(seconds % 60)
     .toString()
@@ -37,41 +38,45 @@ export default function SongCard({
   isCurrent,
   isPlaying,
   isLoading,
+  currentTime,
   onPress,
 }: SongCardProps) {
   return (
     <Pressable
       onPress={() => onPress(song)}
-      className={`flex-row items-center justify-between rounded-xl px-4 py-3.5 border ${
-        isCurrent
-          ? "bg-[#151B2E] border-[#00BFFF]"
-          : "bg-[#111726] border-[#232B44]"
+      className={`flex-row items-center justify-between rounded-2xl px-4 py-2.5 mb-2 ${
+        isCurrent ? "bg-[#4C3A9E]" : "bg-[#1E1B3A]"
       }`}
     >
       <View className="flex-1 mr-3">
-        <Text
-          numberOfLines={1}
-          className={`text-base font-semibold ${
-            isCurrent ? "text-[#00BFFF]" : "text-white"
-          }`}
-        >
+        <Text numberOfLines={1} className="text-white text-[15px] font-semibold">
           {song.title}
         </Text>
-        <Text numberOfLines={1} className="text-gray-400 text-sm mt-0.5">
-          {song.artist?.name ?? "Unknown artist"} ·{" "}
-          {formatDuration(song.duration)}
+        <Text numberOfLines={1} className="text-[#B8B3D9] text-xs mt-0.5">
+          {song.artist?.name ?? "Unknown artist"}
         </Text>
       </View>
 
-      {isLoading ? (
-        <ActivityIndicator size="small" color="#00BFFF" />
-      ) : (
-        <Ionicons
-          name={isPlaying ? "pause-circle" : "play-circle"}
-          size={34}
-          color={isCurrent ? "#00BFFF" : "#6B7280"}
-        />
-      )}
+      <View className="flex-row items-center">
+        <Text className="text-[#D6D2EE] text-xs font-medium mr-2.5">
+          {isCurrent
+            ? `${formatTime(currentTime)} / ${formatTime(song.duration)}`
+            : formatTime(song.duration)}
+        </Text>
+
+        {isLoading ? (
+          <ActivityIndicator size="small" color="#ffffff" />
+        ) : (
+          <View className="w-8 h-8 rounded-full bg-white/15 items-center justify-center">
+            <Ionicons
+              name={isPlaying ? "pause" : "play"}
+              size={16}
+              color="#ffffff"
+              style={{ marginLeft: isPlaying ? 0 : 2 }}
+            />
+          </View>
+        )}
+      </View>
     </Pressable>
   );
 }
