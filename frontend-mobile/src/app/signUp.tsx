@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Text,
   TextInput,
@@ -9,6 +9,8 @@ import {
   Alert,
   View,
   Image,
+  Keyboard,
+  ScrollView,
 } from "react-native";
 import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
@@ -22,6 +24,23 @@ export default function SignUp() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
+      () => setKeyboardVisible(true)
+    );
+    const hideSub = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
+      () => setKeyboardVisible(false)
+    );
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   const signUpMutation = useMutation({
     mutationFn: async () => {
@@ -59,27 +78,33 @@ export default function SignUp() {
   };
 
   return (
-    <View className="flex-1 bg-[#0B0A1F]">
-      {/* TOP: shrunk down so the form has more room */}
-      <View className="flex-[0.6] items-center justify-center">
-        <Image
-          source={require("../../assets/images/tempo-logo-no-text.png")}
-          className="w-64 h-64 opacity-80"
-          resizeMode="contain"
-        />
-      </View>
+    <KeyboardAvoidingView
+      className="flex-1 bg-[#0B0A1F]"
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      {/* TOP: hides instead of squishing when keyboard is open */}
+      {!keyboardVisible && (
+        <View className="flex-[0.6] items-center justify-center">
+          <Image
+            source={require("../../assets/images/tempo-logo-no-text.png")}
+            className="w-64 h-64 opacity-80"
+            resizeMode="contain"
+          />
+        </View>
+      )}
 
-      {/* BOTTOM: taller panel, pulled up, with a more pronounced rounded top */}
-      <KeyboardAvoidingView
-        className="flex-[1.8] justify-evenly"
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-      >
-        <View className="flex-1 bg-[#19163A] rounded-t-[40px] px-6 pt-9 pb-10 justify-between">
+      {/* BOTTOM: scrollable form panel */}
+      <View className="flex-1">
+        <ScrollView
+          className="flex-1 bg-[#19163A] rounded-t-[40px]"
+          contentContainerStyle={{ paddingHorizontal: 24, paddingTop: 36, paddingBottom: 40 }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
           <View className="mb-6">
             <Text className="text-white text-3xl font-bold mb-1.5 text-center">
               Create account
             </Text>
-            
           </View>
 
           <View>
@@ -148,8 +173,8 @@ export default function SignUp() {
               <Text className="text-[#8B5CF6] font-semibold">Log in</Text>
             </Text>
           </Pressable>
-        </View>
-      </KeyboardAvoidingView>
-    </View>
+        </ScrollView>
+      </View>
+    </KeyboardAvoidingView>
   );
 }
