@@ -6,6 +6,7 @@ import cors from "cors";
 import authRoute from "./routes/authRoute.js";
 import playlistRoute from "./routes/playlistRoute.js";
 dotenv.config();
+console.log("RAW DATABASE_URL:", process.env.DATABASE_URL);
 
 const app = express();
 const __dirname = path.resolve();
@@ -32,5 +33,6 @@ if (process.env.NODE_ENV === "production") {
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
+  console.log("DATABASE_URL host check:", process.env.DATABASE_URL?.split('@')[1]?.split('/')[0]);
   console.log(`Server is running on port ${PORT}`);
 });
