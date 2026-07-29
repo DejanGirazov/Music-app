@@ -14,8 +14,8 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#0F172A",
-        "foregroundImage": "./assets/images/tempo-logo.png",
-        "monochromeImage": "./assets/images/tempo-logo.png"
+        "foregroundImage": "./assets/images/tempo-logo-no-text.png",
+        "monochromeImage": "./assets/images/tempo-logo-no-text.png"
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.dejan4577.frontendmobile"
