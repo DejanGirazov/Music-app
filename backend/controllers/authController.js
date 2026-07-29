@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 export const logIn = async (req, res) => {
+  console.log("LOGIN ROUTE HIT");
   try {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -45,6 +46,7 @@ export const logIn = async (req, res) => {
 };
 
 export const signUp = async (req, res) => {
+    console.log("SIGNUP ROUTE HIT");
   try {
 
     const {email, password, fullName} = req.body;
@@ -93,9 +95,9 @@ export const signUp = async (req, res) => {
       },
     });
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: "Internal server error" });
-  }
+  console.error("SIGNUP ERROR:", err);
+  res.status(500).json({ error: err.message });
+}
 };
 
 export const logOut = async (req, res) => {
