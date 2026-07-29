@@ -3,7 +3,6 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 export const logIn = async (req, res) => {
-  console.log("LOGIN ROUTE HIT");
   try {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -46,7 +45,6 @@ export const logIn = async (req, res) => {
 };
 
 export const signUp = async (req, res) => {
-    console.log("SIGNUP ROUTE HIT");
   try {
 
     const {email, password, fullName} = req.body;
