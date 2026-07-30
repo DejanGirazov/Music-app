@@ -10,7 +10,7 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: "#00BFFF",
+        tabBarActiveTintColor: "#8B5CF6",
         tabBarInactiveTintColor: "#8E8E93",
         tabBarStyle: {
           backgroundColor: "#0A0F1E",
@@ -27,7 +27,26 @@ export default function TabsLayout() {
           ),
         }}
       />
+     
       <Tabs.Screen
+        name="search"
+        options={{
+          title: "Search",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="search" color={color} size={size} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="library"
+        options={{
+          title: "Library",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="library" color={color} size={size} />
+          ),
+        }}
+        />
+         <Tabs.Screen
         name="profile"
         options={{
           title: "Profile",

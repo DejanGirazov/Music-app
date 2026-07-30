@@ -1,6 +1,13 @@
 import { create } from "zustand";
-import { createAudioPlayer, AudioPlayer } from "expo-audio";
+import { createAudioPlayer, AudioPlayer, setAudioModeAsync } from "expo-audio";
 import { apiFetch } from "../utils/apiFetch";
+
+// Configure the audio session for background playback (call once)
+setAudioModeAsync({
+  playsInSilentMode: true,
+  shouldPlayInBackground: true,
+  interruptionMode: "doNotMix", // required for lock-screen controls to bind correctly
+});
 
 type Artist = {
   id: number;
@@ -21,6 +28,7 @@ type PlayerState = {
   isLoading: boolean;
   playSong: (song: Song) => Promise<void>;
   togglePlayPause: () => void;
+  seekTo: (value: number) => void;
 };
 
 export const usePlayerStore = create<PlayerState>((set, get) => ({
@@ -31,7 +39,6 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
   playSong: async (song) => {
     const { currentSong, player } = get();
 
-    // Same song tapped again -> just toggle play/pause, no refetch
     if (currentSong?.id === song.id) {
       if (player.playing) {
         player.pause();
@@ -52,6 +59,12 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 
       player.replace({ uri: data.audioUrl });
       player.play();
+
+      // Lock screen / notification controls with metadata
+      player.setActiveForLockScreen(true, {
+        title: song.title,
+        artist: song.artist?.name ?? "Unknown artist",
+      });
     } catch (err) {
       console.log("Playback error:", err);
       set({ currentSong: null });
@@ -67,5 +80,9 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     } else {
       player.play();
     }
+  },
+   seekTo: (seconds: number) => {
+    const { player } = get();
+    player.seekTo(seconds);
   },
 }));
