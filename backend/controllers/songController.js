@@ -196,3 +196,33 @@ export const getStreamUrl = async (req, res) => {
     res.status(500).json({ error: "Failed to generate stream URL" });
   }
 };
+// controllers/songController.js
+export const searchSongs = async (req, res) => {
+  try {
+    const { q } = req.query;
+
+    if (!q || typeof q !== "string" || q.trim().length === 0) {
+      return res.json([]);
+    }
+
+    const query = q.trim();
+
+    const songs = await prisma.song.findMany({
+      where: {
+        OR: [
+          { title: { contains: query, mode: "insensitive" } },
+          { artist: { name: { contains: query, mode: "insensitive" } } },
+        ],
+      },
+      include: {
+        artist: true,
+      },
+      take: 50,
+    });
+
+    res.json(songs);
+  } catch (err) {
+    console.error("Search error:", err);
+    res.status(500).json({ error: "Failed to search songs" });
+  }
+};
