@@ -1,9 +1,16 @@
 import { useState } from "react";
-import { View, Text, FlatList, ActivityIndicator, Pressable } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  ActivityIndicator,
+  Pressable,
+} from "react-native";
 import { useQuery } from "@tanstack/react-query";
 import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import { apiFetch } from "../../../utils/apiFetch";
 import SongCard from "../../../components/SongCard";
+import { usePlayerStore } from "../../../store/playStore";
 
 type Artist = {
   id: number;
@@ -19,10 +26,9 @@ type Song = {
 };
 
 export default function Home() {
-  const [playingId, setPlayingId] = useState<number | null>(null);
-  const [loadingId, setLoadingId] = useState<number | null>(null);
-
-  const player = useAudioPlayer();
+  const currentSong = usePlayerStore((s) => s.currentSong);
+  const playSong = usePlayerStore((s) => s.playSong);
+  const player = usePlayerStore((s) => s.player);
   const status = useAudioPlayerStatus(player);
 
   const {
@@ -39,28 +45,6 @@ export default function Home() {
       return res.json();
     },
   });
-
-  const handlePress = async (song: Song) => {
-    if (playingId === song.id) {
-      status.playing ? player.pause() : player.play();
-      return;
-    }
-
-    try {
-      setLoadingId(song.id);
-      const res = await apiFetch(`/api/songs/${song.id}/stream-url`);
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to get stream URL");
-
-      player.replace({ uri: data.audioUrl });
-      player.play();
-      setPlayingId(song.id);
-    } catch (err) {
-      console.log("Playback error:", err);
-    } finally {
-      setLoadingId(null);
-    }
-  };
 
   if (isLoading) {
     return (
@@ -94,27 +78,29 @@ export default function Home() {
       </Text>
 
       <FlatList
-  data={songs}
-  keyExtractor={(item) => item.id.toString()}
-  onRefresh={refetch}
-  refreshing={isRefetching}
-  contentContainerStyle={{ paddingBottom: 24 }}
-  ListEmptyComponent={
-    <Text className="text-gray-400 text-center mt-10">
-      No songs uploaded yet.
-    </Text>
-  }
-  renderItem={({ item }) => (
-    <SongCard
-      song={item}
-      isCurrent={playingId === item.id}
-      isPlaying={playingId === item.id && status.playing}
-      isLoading={loadingId === item.id}
-      currentTime={playingId === item.id ? status.currentTime : null}
-      onPress={handlePress}
-    />
-  )}
-/>
+        data={songs}
+        keyExtractor={(item) => item.id.toString()}
+        onRefresh={refetch}
+        refreshing={isRefetching}
+        contentContainerStyle={{ paddingBottom: 24 }}
+        ListEmptyComponent={
+          <Text className="text-gray-400 text-center mt-10">
+            No songs uploaded yet.
+          </Text>
+        }
+        renderItem={({ item }) => (
+          <SongCard
+            song={item}
+            isCurrent={currentSong?.id === item.id}
+            isPlaying={currentSong?.id === item.id && status.playing}
+            isLoading={isLoading && currentSong?.id === item.id}
+            currentTime={
+              currentSong?.id === item.id ? status.currentTime : null
+            }
+            onPress={playSong}
+          />
+        )}
+      />
     </View>
   );
 }
