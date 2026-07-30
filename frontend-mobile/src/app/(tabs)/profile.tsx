@@ -38,7 +38,7 @@ export default function Profile() {
   }
 
   return (
-    <View className="flex-1 bg-[#0A0F1E] pt-16 px-5">
+    <View className="flex-1 bg-black pt-16 px-5">
       {/* User info card */}
       <View className="bg-[#1E1B3A] rounded-2xl px-5 py-6 items-center mb-8">
         <View className="w-20 h-20 rounded-full bg-[#4C3A9E] items-center justify-center mb-4">

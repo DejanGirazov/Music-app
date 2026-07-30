@@ -71,7 +71,7 @@ export default function Home() {
   }
 
   return (
-    <View className="flex-1 bg-[#0A0F1E] pt-16 px-5">
+    <View className="flex-1 bg-black pt-16 px-5">
       <Text className="text-white text-3xl font-bold mb-1">Your Library</Text>
       <Text className="text-gray-400 text-base mb-6">
         {songs?.length ?? 0} song{songs?.length === 1 ? "" : "s"}
