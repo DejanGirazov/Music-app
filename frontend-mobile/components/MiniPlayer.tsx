@@ -1,9 +1,10 @@
-import { View, Text, Pressable, ActivityIndicator} from "react-native";
+import { View, Text, Pressable, ActivityIndicator } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAudioPlayerStatus } from "expo-audio";
 import { usePlayerStore } from "../store/playStore";
+import { useEffect } from "react";
 
 const TAB_BAR_HEIGHT = 56;
 
@@ -13,10 +14,20 @@ export default function MiniPlayer() {
   const currentSong = usePlayerStore((s) => s.currentSong);
   const isLoading = usePlayerStore((s) => s.isLoading);
   const togglePlayPause = usePlayerStore((s) => s.togglePlayPause);
+  const playNext = usePlayerStore((s) => s.playNext);
+  const autoplay = usePlayerStore((s) => s.autoplay);
 
   const status = useAudioPlayerStatus(player);
 
+    useEffect(() => {
+    if (status.didJustFinish && autoplay) {
+      playNext();
+    }
+  }, [status.didJustFinish, autoplay]);
+
   if (!currentSong) return null;
+
+
 
   const progress =
     status.duration > 0 ? status.currentTime / status.duration : 0;

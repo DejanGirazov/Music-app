@@ -1,15 +1,26 @@
-import { View, Text, Pressable, PanResponder, LayoutChangeEvent } from "react-native";
+import {
+  View,
+  Text,
+  Pressable,
+  PanResponder,
+  LayoutChangeEvent,
+} from "react-native";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useAudioPlayerStatus } from "expo-audio";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRef, useState } from "react";
 import { usePlayerStore } from "../store/playStore";
+import { useEffect } from "react";
+
 
 function formatTime(seconds: number | null | undefined) {
-  if (seconds === null || seconds === undefined || isNaN(seconds)) return "0:00";
+  if (seconds === null || seconds === undefined || isNaN(seconds))
+    return "0:00";
   const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60).toString().padStart(2, "0");
+  const s = Math.floor(seconds % 60)
+    .toString()
+    .padStart(2, "0");
   return `${m}:${s}`;
 }
 
@@ -21,7 +32,13 @@ type ScrubberProps = {
   onSlidingComplete: (value: number) => void;
 };
 
-function Scrubber({ value, duration, onSlidingStart, onValueChange, onSlidingComplete }: ScrubberProps) {
+function Scrubber({
+  value,
+  duration,
+  onSlidingStart,
+  onValueChange,
+  onSlidingComplete,
+}: ScrubberProps) {
   const [trackWidth, setTrackWidth] = useState(0);
   const trackWidthRef = useRef(0);
 
@@ -51,10 +68,11 @@ function Scrubber({ value, duration, onSlidingStart, onValueChange, onSlidingCom
       onPanResponderRelease: (evt) => {
         onSlidingComplete(positionToSeconds(evt.nativeEvent.locationX));
       },
-    })
+    }),
   ).current;
 
-  const progress = duration > 0 ? Math.max(0, Math.min(1, value / duration)) : 0;
+  const progress =
+    duration > 0 ? Math.max(0, Math.min(1, value / duration)) : 0;
 
   return (
     <View
@@ -92,12 +110,20 @@ export default function SongDetails({ songId }: Props) {
   const seekTo = usePlayerStore((s) => s.seekTo);
 
   const status = useAudioPlayerStatus(player);
+  const playNext = usePlayerStore((s) => s.playNext);
+  const playPrevious = usePlayerStore((s) => s.playPrevious);
 
   const [isScrubbing, setIsScrubbing] = useState(false);
   const [scrubValue, setScrubValue] = useState(0);
 
-  if (!currentSong || currentSong.id.toString() !== songId) {
-    return (
+   useEffect(() => {
+    if (currentSong && currentSong.id.toString() !== songId) {
+      router.setParams({ songId: currentSong.id.toString() });
+    }
+  }, [currentSong?.id]);
+
+  if (!currentSong) {
+    return ( (
       <View className="flex-1 bg-[#0A0F1E] justify-center items-center px-6">
         <Text className="text-gray-400 text-base text-center">
           Nothing playing right now.
@@ -109,8 +135,10 @@ export default function SongDetails({ songId }: Props) {
           <Text className="text-white font-semibold">Go back</Text>
         </Pressable>
       </View>
-    );
+    ));
   }
+
+  
 
   const duration = status.duration || 0;
   const displayTime = isScrubbing ? scrubValue : status.currentTime;
@@ -140,10 +168,16 @@ export default function SongDetails({ songId }: Props) {
 
       {/* Title / artist */}
       <View className="mt-8">
-        <Text numberOfLines={1} className="text-white text-2xl font-bold text-center">
+        <Text
+          numberOfLines={1}
+          className="text-white text-2xl font-bold text-center"
+        >
           {currentSong.title}
         </Text>
-        <Text numberOfLines={1} className="text-[#B8B3D9] text-base text-center mt-1">
+        <Text
+          numberOfLines={1}
+          className="text-[#B8B3D9] text-base text-center mt-1"
+        >
           {currentSong.artist?.name ?? "Unknown artist"}
         </Text>
       </View>
@@ -164,13 +198,18 @@ export default function SongDetails({ songId }: Props) {
           }}
         />
         <View className="flex-row justify-between mt-1">
-          <Text className="text-[#B8B3D9] text-xs">{formatTime(displayTime)}</Text>
+          <Text className="text-[#B8B3D9] text-xs">
+            {formatTime(displayTime)}
+          </Text>
           <Text className="text-[#B8B3D9] text-xs">{formatTime(duration)}</Text>
         </View>
       </View>
 
       {/* Playback controls */}
-      <View className="flex-row items-center justify-center mt-8">
+      <View className="flex-row items-center justify-center mt-8 mb-10">
+        <Pressable onPress={playPrevious} className="mr-6">
+          <Ionicons name="play-skip-back" size={28} color="#ffffff" />
+        </Pressable>
         <Pressable
           onPress={togglePlayPause}
           className="w-16 h-16 rounded-full bg-[#8B5CF6] items-center justify-center"
@@ -181,6 +220,9 @@ export default function SongDetails({ songId }: Props) {
             color="#ffffff"
             style={{ marginLeft: status.playing ? 0 : 3 }}
           />
+        </Pressable>
+        <Pressable onPress={playNext} className="ml-6">
+          <Ionicons name="play-skip-forward" size={28} color="#ffffff" />
         </Pressable>
       </View>
     </View>

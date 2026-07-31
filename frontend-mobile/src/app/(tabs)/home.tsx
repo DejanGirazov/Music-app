@@ -11,6 +11,8 @@ import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import { apiFetch } from "../../../utils/apiFetch";
 import SongCard from "../../../components/SongCard";
 import { usePlayerStore } from "../../../store/playStore";
+import { useEffect } from "react";
+
 
 type Artist = {
   id: number;
@@ -30,6 +32,10 @@ export default function Home() {
   const playSong = usePlayerStore((s) => s.playSong);
   const player = usePlayerStore((s) => s.player);
   const status = useAudioPlayerStatus(player);
+  const setQueue = usePlayerStore((s) => s.setQueue);
+
+
+
 
   const {
     data: songs,
@@ -45,6 +51,10 @@ export default function Home() {
       return res.json();
     },
   });
+
+    useEffect(() => {
+  if (songs) setQueue(songs);
+}, [songs, setQueue]);
 
   if (isLoading) {
     return (
