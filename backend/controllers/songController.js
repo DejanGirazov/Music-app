@@ -226,3 +226,25 @@ export const searchSongs = async (req, res) => {
     res.status(500).json({ error: "Failed to search songs" });
   }
 };
+export const getRecentSongs = async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 5;
+
+    const songs = await prisma.song.findMany({
+      orderBy: { createdAt: "desc" },
+      take: limit,
+      select: {
+        id: true,
+        title: true,
+        duration: true,
+        createdAt: true,
+        artist: true,
+      },
+    });
+
+    res.status(200).json(songs);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Failed to fetch recent songs" });
+  }
+};
