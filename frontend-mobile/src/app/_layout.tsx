@@ -10,13 +10,35 @@ import { ActivityIndicator, View } from "react-native";
 import { apiFetch } from "../../utils/apiFetch";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import "./globals.css";
+import TrackPlayer, { PlayerCommand } from "@rntp/player";
 
 const queryClient = new QueryClient();
+let isPlayerSetup = false;
 
 function RootLayoutNav() {
   const router = useRouter();
   const segments = useSegments();
   const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    if (isPlayerSetup) return;
+    isPlayerSetup = true;
+
+    try {
+      TrackPlayer.setupPlayer();
+
+      TrackPlayer.setCommands({
+        capabilities: [
+          PlayerCommand.PlayPause,
+          PlayerCommand.Next,
+          PlayerCommand.Previous,
+          PlayerCommand.Seek,
+        ],
+        handling: "native",
+      });
+    } catch (err) {
+      console.log("setupPlayer error:", err);
+    }
+  }, []);
 
   const { data: authUser, isLoading } = useQuery({
     queryKey: ["authUser"],
@@ -44,19 +66,19 @@ function RootLayoutNav() {
   }, []);
 
   useEffect(() => {
-  if (!mounted) return;
-  if (isLoading) return;
+    if (!mounted) return;
+    if (isLoading) return;
 
-  const inAuthGroup = segments[0] === "logIn" || segments[0] === "signUp";
+    const inAuthGroup = segments[0] === "logIn" || segments[0] === "signUp";
 
-  if (!authUser && !inAuthGroup) {
-    // not logged in, and not already on an auth screen → send to login
-    router.replace("/logIn" as any);
-  } else if (authUser && (inAuthGroup )) {
-    // logged in, but on login/signup or bare root → send to home
-    router.replace("/(tabs)/home" as any);
-  }
-}, [authUser, isLoading, segments, mounted]);
+    if (!authUser && !inAuthGroup) {
+      // not logged in, and not already on an auth screen → send to login
+      router.replace("/logIn" as any);
+    } else if (authUser && inAuthGroup) {
+      // logged in, but on login/signup or bare root → send to home
+      router.replace("/(tabs)/home" as any);
+    }
+  }, [authUser, isLoading, segments, mounted]);
 
   if (isLoading) {
     return (
@@ -74,12 +96,11 @@ function RootLayoutNav() {
   }
 
   return (
-   
-  <Stack screenOptions={{ headerShown: false }}>
-    <Stack.Screen name="(tabs)" />
-    <Stack.Screen name="logIn" />
-    <Stack.Screen name="signUp" />
-  </Stack>
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="(tabs)" />
+      <Stack.Screen name="logIn" />
+      <Stack.Screen name="signUp" />
+    </Stack>
   );
 }
 
@@ -87,7 +108,7 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <SafeAreaProvider>
-         <RootLayoutNav />
+        <RootLayoutNav />
       </SafeAreaProvider>
     </QueryClientProvider>
   );

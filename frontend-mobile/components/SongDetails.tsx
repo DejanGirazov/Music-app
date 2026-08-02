@@ -7,12 +7,10 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { useAudioPlayerStatus } from "expo-audio";
+import { useIsPlaying, useProgress } from "@rntp/player";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { usePlayerStore } from "../store/playStore";
-import { useEffect } from "react";
-
 
 function formatTime(seconds: number | null | undefined) {
   if (seconds === null || seconds === undefined || isNaN(seconds))
@@ -81,14 +79,11 @@ function Scrubber({
       className="h-8 justify-center"
       hitSlop={{ top: 12, bottom: 12 }}
     >
-      {/* Track background */}
       <View className="h-1.5 rounded-full bg-[#403872] w-full" />
-      {/* Track fill */}
       <View
         className="h-1.5 rounded-full bg-[#8B5CF6] absolute left-0"
         style={{ width: trackWidth * progress }}
       />
-      {/* Thumb */}
       <View
         className="w-4 h-4 rounded-full bg-[#8B5CF6] absolute"
         style={{ left: Math.max(0, trackWidth * progress - 8) }}
@@ -105,25 +100,25 @@ export default function SongDetails({ songId }: Props) {
   const insets = useSafeAreaInsets();
 
   const currentSong = usePlayerStore((s) => s.currentSong);
-  const player = usePlayerStore((s) => s.player);
   const togglePlayPause = usePlayerStore((s) => s.togglePlayPause);
   const seekTo = usePlayerStore((s) => s.seekTo);
-
-  const status = useAudioPlayerStatus(player);
   const playNext = usePlayerStore((s) => s.playNext);
   const playPrevious = usePlayerStore((s) => s.playPrevious);
+
+  const isPlaying = useIsPlaying();
+  const progress = useProgress();
 
   const [isScrubbing, setIsScrubbing] = useState(false);
   const [scrubValue, setScrubValue] = useState(0);
 
-   useEffect(() => {
+  useEffect(() => {
     if (currentSong && currentSong.id.toString() !== songId) {
       router.setParams({ songId: currentSong.id.toString() });
     }
   }, [currentSong?.id]);
 
   if (!currentSong) {
-    return ( (
+    return (
       <View className="flex-1 bg-[#0A0F1E] justify-center items-center px-6">
         <Text className="text-gray-400 text-base text-center">
           Nothing playing right now.
@@ -135,13 +130,11 @@ export default function SongDetails({ songId }: Props) {
           <Text className="text-white font-semibold">Go back</Text>
         </Pressable>
       </View>
-    ));
+    );
   }
 
-  
-
-  const duration = status.duration || 0;
-  const displayTime = isScrubbing ? scrubValue : status.currentTime;
+  const duration = progress.duration || 0;
+  const displayTime = isScrubbing ? scrubValue : progress.position;
 
   return (
     <View
@@ -188,7 +181,7 @@ export default function SongDetails({ songId }: Props) {
           value={displayTime}
           duration={duration}
           onSlidingStart={() => {
-            setScrubValue(status.currentTime);
+            setScrubValue(progress.position);
             setIsScrubbing(true);
           }}
           onValueChange={(value) => setScrubValue(value)}
@@ -215,10 +208,10 @@ export default function SongDetails({ songId }: Props) {
           className="w-16 h-16 rounded-full bg-[#8B5CF6] items-center justify-center"
         >
           <Ionicons
-            name={status.playing ? "pause" : "play"}
+            name={isPlaying ? "pause" : "play"}
             size={28}
             color="#ffffff"
-            style={{ marginLeft: status.playing ? 0 : 3 }}
+            style={{ marginLeft: isPlaying ? 0 : 3 }}
           />
         </Pressable>
         <Pressable onPress={playNext} className="ml-6">

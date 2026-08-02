@@ -9,7 +9,10 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/images/tempo-logo-no-text.png",
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "UIBackgroundModes": ["audio"]
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -26,12 +29,7 @@
       "bundler": "metro"
     },
     "plugins": [
-      [
-        "expo-router",
-        {
-          "root": "./src/app"
-        }
-      ],
+      ["expo-router", { "root": "./src/app" }],
       [
         "expo-splash-screen",
         {
@@ -40,13 +38,7 @@
           "imageWidth": 76
         }
       ],
-      "expo-secure-store",
-      [
-        "expo-audio",
-        {
-          "enableBackgroundPlayback": true
-        }
-      ]
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,

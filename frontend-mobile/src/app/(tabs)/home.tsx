@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,12 +7,11 @@ import {
   Pressable,
 } from "react-native";
 import { useQuery } from "@tanstack/react-query";
-import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
+import { useIsPlaying } from "@rntp/player";
 import { useRouter } from "expo-router";
 import { apiFetch } from "../../../utils/apiFetch";
 import SongCard from "../../../components/SongCard";
 import { usePlayerStore } from "../../../store/playStore";
-import { useEffect } from "react";
 
 type Artist = {
   id: number;
@@ -37,11 +36,9 @@ export default function Home() {
   const router = useRouter();
   const currentSong = usePlayerStore((s) => s.currentSong);
   const playSong = usePlayerStore((s) => s.playSong);
-  const player = usePlayerStore((s) => s.player);
-  const status = useAudioPlayerStatus(player);
   const setQueue = usePlayerStore((s) => s.setQueue);
 
-  const {
+const isPlaying = useIsPlaying();  const {
     data: songs,
     isLoading,
     isError,
@@ -135,7 +132,7 @@ export default function Home() {
               >
                 <View className="w-9 h-9 rounded-lg bg-[#4C3A9E] items-center justify-center mr-3">
                   <Text className="text-white text-lg">
-                    {status.playing ? "❚❚" : "▶"}
+                    {isPlaying ? "❚❚" : "▶"}
                   </Text>
                 </View>
                 <View className="flex-1">
@@ -197,9 +194,9 @@ export default function Home() {
         <SongCard
           song={item}
           isCurrent={currentSong?.id === item.id}
-          isPlaying={currentSong?.id === item.id && status.playing}
+          isPlaying={currentSong?.id === item.id && isPlaying}
           isLoading={isLoading && currentSong?.id === item.id}
-          currentTime={currentSong?.id === item.id ? status.currentTime : null}
+          currentTime={null}
           onPress={playSong}
         />
       )}

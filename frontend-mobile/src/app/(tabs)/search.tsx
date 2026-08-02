@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { View, Text, TextInput, FlatList, TouchableOpacity, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useAudioPlayerStatus } from "expo-audio";
+import { useIsPlaying } from "@rntp/player";
 import { apiFetch } from "../../../utils/apiFetch";
 import { usePlayerStore, Song } from "../../../store/playStore";
 import SongCard from "../../../components/SongCard";
@@ -15,11 +15,11 @@ export default function SearchScreen() {
 
   const requestIdRef = useRef(0);
 
-  const player = usePlayerStore((s) => s.player);
   const currentSong = usePlayerStore((s) => s.currentSong);
   const isLoadingSong = usePlayerStore((s) => s.isLoading);
   const playSong = usePlayerStore((s) => s.playSong);
-  const playerStatus = useAudioPlayerStatus(player);
+
+  const isPlaying = useIsPlaying();
 
   useEffect(() => {
     const handle = setTimeout(() => setDebouncedQuery(query.trim()), 250);
@@ -145,9 +145,9 @@ export default function SearchScreen() {
             <SongCard
               song={item}
               isCurrent={isCurrent}
-              isPlaying={isCurrent && playerStatus.playing}
+              isPlaying={isCurrent && isPlaying}
               isLoading={isCurrent && isLoadingSong}
-              currentTime={isCurrent ? playerStatus.currentTime : null}
+              currentTime={null}
               onPress={playSong}
             />
           );
