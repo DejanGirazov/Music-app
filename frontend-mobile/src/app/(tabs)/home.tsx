@@ -12,6 +12,7 @@ import { useRouter } from "expo-router";
 import { apiFetch } from "../../../utils/apiFetch";
 import SongCard from "../../../components/SongCard";
 import { usePlayerStore } from "../../../store/playStore";
+import Ionicons from "@expo/vector-icons/build/Ionicons";
 
 type Artist = {
   id: number;
@@ -38,7 +39,8 @@ export default function Home() {
   const playSong = usePlayerStore((s) => s.playSong);
   const setQueue = usePlayerStore((s) => s.setQueue);
 
-const isPlaying = useIsPlaying();  const {
+  const isPlaying = useIsPlaying();
+  const {
     data: songs,
     isLoading,
     isError,
@@ -131,9 +133,11 @@ const isPlaying = useIsPlaying();  const {
                 className="flex-row items-center bg-[#211E45] rounded-xl px-3 py-2.5 mb-8"
               >
                 <View className="w-9 h-9 rounded-lg bg-[#4C3A9E] items-center justify-center mr-3">
-                  <Text className="text-white text-lg">
-                    {isPlaying ? "❚❚" : "▶"}
-                  </Text>
+                    {isPlaying ? (
+                      <Ionicons name="pause-outline" size={15} color="white" />
+                    ) : (
+                      <Ionicons name="play-outline" size={15} color="white" />
+                    )}
                 </View>
                 <View className="flex-1">
                   <Text

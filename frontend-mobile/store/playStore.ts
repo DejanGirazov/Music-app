@@ -76,14 +76,13 @@ export const usePlayerStore = create<PlayerState>()(
       },
 
       playSong: async (song, queue) => {
-        const { currentSong } = get();
+        const { currentSong, loadedIds } = get();
 
-        if (currentSong?.id === song.id) {
+        if (currentSong?.id === song.id && loadedIds.has(song.id)) {
           const playing = TrackPlayer.isPlaying();
           playing ? TrackPlayer.pause() : TrackPlayer.play();
           return;
         }
-
         const activeQueue = queue ?? get().queue;
         const idx = activeQueue.findIndex((s) => s.id === song.id);
 
