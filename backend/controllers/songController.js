@@ -255,7 +255,7 @@ export const getArtists = async (req, res) => {
     const artists = await prisma.artist.findMany({
       where: { songs: { some: {} } }, // only artists with at least 1 song
       include: { _count: { select: { songs: true } } },
-      orderBy: { name: "asc" },
+      orderBy: { songs: { _count: "desc" } }, // most songs first
     });
     res.status(200).json(artists);
   } catch (err) {
