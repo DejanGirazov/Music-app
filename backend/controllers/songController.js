@@ -248,3 +248,55 @@ export const getRecentSongs = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch recent songs" });
   }
 };
+
+// Acts like a "playlists index" for auto-generated artist playlists
+export const getArtists = async (req, res) => {
+  try {
+    const artists = await prisma.artist.findMany({
+      where: { songs: { some: {} } }, // only artists with at least 1 song
+      include: { _count: { select: { songs: true } } },
+      orderBy: { name: "asc" },
+    });
+    res.status(200).json(artists);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Failed to fetch artists" });
+  }
+};
+
+// Shaped like a "playlist" response so the frontend can reuse one screen
+export const getArtistPlaylist = async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ error: "Invalid artist id" });
+    }
+
+    const artist = await prisma.artist.findUnique({
+      where: { id },
+      include: {
+        songs: {
+          orderBy: { createdAt: "asc" },
+        },
+      },
+    });
+
+    if (!artist) {
+      return res.status(404).json({ error: "Artist not found" });
+    }
+
+    // Reshape to match your playlist detail response
+    res.status(200).json({
+      id: `artist-${artist.id}`,
+      title: artist.name,
+      type: "ARTIST",
+      songs: artist.songs.map((song, i) => ({
+        position: i,
+        song: { ...song, artist: { id: artist.id, name: artist.name } },
+      })),
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Failed to fetch artist playlist" });
+  }
+};

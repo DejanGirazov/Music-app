@@ -1,6 +1,6 @@
 import express from "express";
 import multer from "multer";
-import { postSong,getSongs, getSong, updateSong, deleteSong, getStreamUrl, searchSongs, getRecentSongs } from "../controllers/songController.js";
+import { postSong,getSongs, getSong, updateSong, deleteSong, getStreamUrl, searchSongs, getRecentSongs, getArtists, getArtistPlaylist } from "../controllers/songController.js";
 import { protectRoute } from "../middleware/protectRoute.js";
 import { requireAdmin } from "../middleware/requireAdmin.js";
 
@@ -15,5 +15,8 @@ router.put("/updateSong/:id",protectRoute,requireAdmin, updateSong);
 router.delete("/deleteSong/:id",protectRoute,requireAdmin, deleteSong);
 router.get("/:id/stream-url", protectRoute, getStreamUrl);
 router.get("/recent", protectRoute, getRecentSongs);
+router.get("/artists", protectRoute, getArtists);
+router.get("/artists/:id/playlist", protectRoute, getArtistPlaylist);
+
 
 export default router;
