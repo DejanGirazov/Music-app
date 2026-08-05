@@ -57,6 +57,10 @@ export default function TabsLayout() {
             ),
           }}
         />
+        <Tabs.Screen name="artist/[id]" options={{ href: null }} />
+        <Tabs.Screen name="playlist/[id]" options={{ href: null }} />
+        <Tabs.Screen name="song/[id]" options={{ href: null }} />
+
       </Tabs>
       {hasLoadedSong  && <MiniPlayer />}
     </View>

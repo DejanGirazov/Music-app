@@ -10,9 +10,9 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useIsPlaying } from "@rntp/player";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { apiFetch } from "../../../utils/apiFetch";
-import SongCard from "../../../components/SongCard";
-import { usePlayerStore } from "../../../store/playStore";
+import { apiFetch } from "../../../../utils/apiFetch";
+import SongCard from "../../../../components/SongCard";
+import { usePlayerStore } from "../../../../store/playStore";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 
 type Song = {

@@ -167,6 +167,11 @@ export default function Library() {
 
   return (
     <SafeAreaView className="flex-1 bg-[#0A0F1E]">
+       <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 20 : 20}
+      >
       <FlatList
         contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 24 }}
         data={playlists ?? []}
@@ -235,9 +240,11 @@ export default function Library() {
         transparent
         onRequestClose={() => setCreateModalVisible(false)}
       >
+        <SafeAreaView className="flex-1 bg-black">
         <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-          className="flex-1 justify-end"
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          className="flex-1"
+          keyboardVerticalOffset={Platform.OS === "ios" ? 20 : 20}
         >
           <View className="bg-[#0A0F1E] border-t border-[#232B44] rounded-t-2xl px-6 pt-6 pb-8">
             <View className="flex-row items-center justify-between mb-5">
@@ -288,6 +295,7 @@ export default function Library() {
             </Pressable>
           </View>
         </KeyboardAvoidingView>
+        </SafeAreaView>
       </Modal>
 
       {/* Add Songs Modal */}
@@ -368,6 +376,7 @@ export default function Library() {
           />
         </SafeAreaView>
       </Modal>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
