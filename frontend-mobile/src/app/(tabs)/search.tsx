@@ -1,5 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { View, Text, TextInput, FlatList, TouchableOpacity, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  FlatList,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useIsPlaying } from "@rntp/player";
 import { apiFetch } from "../../../utils/apiFetch";
@@ -14,8 +21,7 @@ export default function SearchScreen() {
   const [isSearching, setIsSearching] = useState(false);
   const [selectedArtist, setSelectedArtist] = useState<string | null>(null);
 
-    const router = useRouter();
-
+  const router = useRouter();
 
   const requestIdRef = useRef(0);
 
@@ -43,7 +49,7 @@ export default function SearchScreen() {
     (async () => {
       try {
         const res = await apiFetch(
-          `/api/songs/search?q=${encodeURIComponent(debouncedQuery)}`
+          `/api/songs/search?q=${encodeURIComponent(debouncedQuery)}`,
         );
         const data = await res.json();
 
@@ -127,7 +133,7 @@ export default function SearchScreen() {
             renderItem={({ item }) => (
               <TouchableOpacity
                 className="bg-neutral-900 rounded-full px-3.5 py-2 mr-2"
-                onPress={() =>  router.push(`/artist/${item.id}` as any)}
+                onPress={() => router.push(`/artist/${item.id}` as any)}
               >
                 <Text className="text-white text-sm">{item.name}</Text>
               </TouchableOpacity>

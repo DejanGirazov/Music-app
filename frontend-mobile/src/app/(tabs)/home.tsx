@@ -60,7 +60,7 @@ export default function Home() {
     {
       queryKey: ["playlists"],
       queryFn: async () => {
-        const res = await apiFetch("/api/playlists");
+        const res = await apiFetch("/api/playlist/getPlaylists");
         if (!res.ok) throw new Error("Failed to load playlists");
         return res.json();
       },
