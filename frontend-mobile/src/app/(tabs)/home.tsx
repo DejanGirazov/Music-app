@@ -17,6 +17,7 @@ import Ionicons from "@expo/vector-icons/build/Ionicons";
 type Artist = {
   id: number;
   name: string;
+  _count: { songs: number };
 };
 
 type Song = {
@@ -65,6 +66,14 @@ export default function Home() {
       },
     },
   );
+  const { data: artists, isLoading: loadingArtists } = useQuery<Artist[]>({
+    queryKey: ["artists"],
+    queryFn: async () => {
+      const res = await apiFetch("/api/songs/artists");
+      if (!res.ok) throw new Error("Failed to load artists");
+      return res.json();
+    },
+  });
 
   useEffect(() => {
     if (songs) setQueue(songs);
@@ -133,11 +142,11 @@ export default function Home() {
                 className="flex-row items-center bg-[#211E45] rounded-xl px-3 py-2.5 mb-8"
               >
                 <View className="w-9 h-9 rounded-lg bg-[#4C3A9E] items-center justify-center mr-3">
-                    {isPlaying ? (
-                      <Ionicons name="pause-outline" size={15} color="white" />
-                    ) : (
-                      <Ionicons name="play-outline" size={15} color="white" />
-                    )}
+                  {isPlaying ? (
+                    <Ionicons name="pause-outline" size={15} color="white" />
+                  ) : (
+                    <Ionicons name="play-outline" size={15} color="white" />
+                  )}
                 </View>
                 <View className="flex-1">
                   <Text
@@ -183,7 +192,35 @@ export default function Home() {
               )}
             />
           )}
-
+          <Text className="text-white text-lg font-semibold mb-3">Artists</Text>
+          {loadingArtists ? (
+            <ActivityIndicator color="#00BFFF" style={{ marginBottom: 24 }} />
+          ) : (
+            <FlatList
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              data={artists ?? []}
+              keyExtractor={(item) => item.id.toString()}
+              contentContainerStyle={{ gap: 10, paddingBottom: 4 }}
+              style={{ marginBottom: 28 }}
+              ListEmptyComponent={
+                <Text className="text-gray-400 text-sm">No artists yet.</Text>
+              }
+              renderItem={({ item }) => (
+                <Pressable
+                  onPress={() => router.push(`/artist/${item.id}` as any)}
+                  className="w-32 bg-[#151B2E] border border-[#232B44] rounded-xl p-3"
+                >
+                  <Text numberOfLines={1} className="text-white text-sm">
+                    {item.name}
+                  </Text>
+                  <Text className="text-gray-500 text-xs mt-0.5">
+                    {item._count.songs} song{item._count.songs === 1 ? "" : "s"}
+                  </Text>
+                </Pressable>
+              )}
+            />
+          )}
           <Text className="text-white text-lg font-semibold mb-3">
             Recently added
           </Text>

@@ -5,6 +5,7 @@ import { useIsPlaying } from "@rntp/player";
 import { apiFetch } from "../../../utils/apiFetch";
 import { usePlayerStore, Song } from "../../../store/playStore";
 import SongCard from "../../../components/SongCard";
+import { useRouter } from "expo-router";
 
 export default function SearchScreen() {
   const [query, setQuery] = useState("");
@@ -12,6 +13,9 @@ export default function SearchScreen() {
   const [results, setResults] = useState<Song[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [selectedArtist, setSelectedArtist] = useState<string | null>(null);
+
+    const router = useRouter();
+
 
   const requestIdRef = useRef(0);
 
@@ -123,7 +127,7 @@ export default function SearchScreen() {
             renderItem={({ item }) => (
               <TouchableOpacity
                 className="bg-neutral-900 rounded-full px-3.5 py-2 mr-2"
-                onPress={() => setSelectedArtist(item.name)}
+                onPress={() =>  router.push(`/artist/${item.id}` as any)}
               >
                 <Text className="text-white text-sm">{item.name}</Text>
               </TouchableOpacity>
